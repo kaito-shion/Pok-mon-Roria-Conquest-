@@ -115,6 +115,12 @@ local function addHighlight(model, color)
 	return highlight
 end
 
+-- Check if name is a chunk (chunk# or chunkVC#)
+local function isChunk(name)
+	local lowerName = string.lower(name)
+	return string.match(lowerName, "^chunk%d+$") or string.match(lowerName, "^chunkvc%d+$")
+end
+
 -- ================================================
 -- CREATE WINDOW AND TABS
 -- ================================================
@@ -553,10 +559,9 @@ local function getChunkNPCs()
 	chunkOptions = {}
 	currentChunk = nil
 	
-	-- Search for any chunk# or Chunk# in workspace
+	-- Search for any chunk# or chunkVC# in workspace
 	for _, v in pairs(workspace:GetChildren()) do
-		local lowerName = string.lower(v.Name)
-		if string.match(lowerName, "^chunk%d+$") then
+		if isChunk(v.Name) then
 			currentChunk = v
 			print("[CHUNK] Found: " .. v.Name)
 			break
@@ -686,10 +691,9 @@ MainTab:CreateLabel("💎 Items")
 local function getItems()
 	itemOptions = {}
 	
-	-- Search in all chunks
+	-- Search in all chunks (chunk# and chunkVC#)
 	for _, chunk in pairs(workspace:GetChildren()) do
-		local lowerName = string.lower(chunk.Name)
-		if string.match(lowerName, "^chunk%d+$") then
+		if isChunk(chunk.Name) then
 			for _, v in pairs(chunk:GetChildren()) do
 				if v.Name == "#Item" and v:IsA("Model") then
 					table.insert(itemOptions, v:GetFullName())
@@ -724,8 +728,7 @@ local ItemDropdown = MainTab:CreateDropdown({
 		-- Add highlight to selected item
 		if option ~= "NO ITEMS FOUND" then
 			for _, chunk in pairs(workspace:GetChildren()) do
-				local lowerName = string.lower(chunk.Name)
-				if string.match(lowerName, "^chunk%d+$") then
+				if isChunk(chunk.Name) then
 					local item = chunk:FindFirstChild("#Item")
 					if item and item:IsA("Model") then
 						currentItemHighlight = addHighlight(item, Color3.fromRGB(255, 215, 0))
@@ -785,8 +788,7 @@ MainTab:CreateButton({
 		
 		local item = nil
 		for _, chunk in pairs(workspace:GetChildren()) do
-			local lowerName = string.lower(chunk.Name)
-			if string.match(lowerName, "^chunk%d+$") then
+			if isChunk(chunk.Name) then
 				item = chunk:FindFirstChild("#Item")
 				if item then break end
 			end
@@ -858,8 +860,7 @@ MiscTab:CreateButton({
 	Callback = function()
 		if not grassRemoved then
 			for _, v in pairs(workspace:GetChildren()) do
-				local lowerName = string.lower(v.Name)
-				if string.match(lowerName, "^chunk%d+$") then
+				if isChunk(v.Name) then
 					local grassVariants = {"MGrass", "Grass", "grass", "mgrass"}
 					for _, variant in ipairs(grassVariants) do
 						local grass = v:FindFirstChild(variant)
@@ -892,8 +893,7 @@ MiscTab:CreateButton({
 	Callback = function()
 		if not sandRemoved then
 			for _, v in pairs(workspace:GetChildren()) do
-				local lowerName = string.lower(v.Name)
-				if string.match(lowerName, "^chunk%d+$") then
+				if isChunk(v.Name) then
 					local sandVariants = {"MSand", "Sand", "sand", "msand"}
 					for _, variant in ipairs(sandVariants) do
 						local sand = v:FindFirstChild(variant)
@@ -926,8 +926,7 @@ MiscTab:CreateButton({
 	Callback = function()
 		if not snowRemoved then
 			for _, v in pairs(workspace:GetChildren()) do
-				local lowerName = string.lower(v.Name)
-				if string.match(lowerName, "^chunk%d+$") then
+				if isChunk(v.Name) then
 					local snowVariants = {"MSnow", "Snow", "snow", "msnow"}
 					for _, variant in ipairs(snowVariants) do
 						local snow = v:FindFirstChild(variant)
